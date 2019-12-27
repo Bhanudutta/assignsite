@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+  <script>
+  start = -1
+  //gl_tree = {"-1":[{name:"All",id:0}]}
+  gl_tree = {}
+  loading = false
+  function createPbutton(id,name)
+  {
+    var btn = document.createElement("input");
+    btn.setAttribute("id",id+"_p")
+    btn.setAttribute("class","btn btn-primary")
+    btn.setAttribute("value",name)
+    btn.style.width = "150px"
+    return btn;
+  }
+  function createSbutton(id)
+  {
+    var btn = document.createElement("input");
+    btn.setAttribute("id",id+"_s")
+    btn.setAttribute("class","btn btn-secondary")
+    btn.setAttribute("value","+")
+    btn.style.width = "50px"
+    return btn;
+  }
+  function rec_collapse_children(rid)
+  {
+    let ob = gl_tree[rid]
+    if(typeof ob !== "undefined")
+    {
+      for(i=0;i<ob.length;i++)
+      {
+        document.getElementById(ob[i].id).remove();
+      }
+    }
+  }
+  function traverse_tree(root,pid = -1,level = 0)
+  {
+    let ob = gl_tree[pid]
+    console.log(ob)
+    if(typeof ob !== "undefined")
+    {
+      for(i=0;i<ob.length;i++)
+      {
+        dv = document.createElement("DIV")
+        dv.id = ob[i].id;
+        dv.setAttribute("level",level)
+        dv.setAttribute("parent",pid)
+        root.appendChild(dv);
+        var v_btn = createPbutton(ob[i].id,ob[i].name)
+        var a_btn = createSbutton(ob[i].id)
+        margin = level*50;
+        v_btn.style.marginLeft = margin+"px";
+
+        v_btn.onclick = function(){
+          let id = this.id.slice(0,-2)
+          let ele = document.getElementById(id)
+          let l = Number(ele.getAttribute("level"))+1
+          tree_req(ele,l,id);
+          }
+        a_btn.onclick = function(){
+          let id = this.id.slice(0,-2)
+          // let ele = document.getElementById(id)
+          // let l = Number(ele.getAttribute("level"))+1
+          rec_collapse_children(id)
+          let name = prompt("Enter name")
+          add(name,id);
+        }
+        dv.appendChild(v_btn)
+        dv.appendChild(a_btn)
+      }
+    }
+  }
+
+  function tree_req(div,level,parent_id){
+      loading = true
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        json = JSON.parse(this.responseText)
+        console.log(json)
+        gl_tree[parent_id] = json[parent_id];
+        try
+          {
+            rec_collapse_children(parent_id)
+            console.log("rm")
+          }
+        catch(err)
+          {console.log(err)}
+        traverse_tree(div,parent_id,level);
+        }
+      };
+      xhttp.open("GET", "http://127.0.0.1:8000/Accessories/view/"+parent_id, true);
+      xhttp.send();
+
+    }
+
+function add(name,pid)
+{
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+  if (this.readyState == 4 && this.status == 200) {
+    console.log(this.responseText)
+    }
+  };
+  xhttp.open("GET", "http://127.0.0.1:8000/Accessories/add/"+name+"/"+pid, true);
+  xhttp.send();
+
+}
+function  tree()
+  {
+    r = document.getElementById("Tree");
+    tree_req(r,0,-1);
+  }
+  </script>
+</head>
+<body onload="tree()">
+
+<div class="jumbotron text-center">
+  <h1>Accessories APP</h1>
+</div>
+
+<div class="container">
+  <div class="row">
+    <h3>Products</h3>
+  </div>
+  <div class="row" id="Tree">
+  </div>
+
+</div>
+
+</body>
+</html>
