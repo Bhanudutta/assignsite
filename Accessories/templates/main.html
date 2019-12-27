@@ -98,7 +98,7 @@
         traverse_tree(div,parent_id,level);
         }
       };
-      xhttp.open("GET", "http://127.0.0.1:8000/Accessories/view/"+parent_id, true);
+      xhttp.open("GET", "/Accessories/view/"+parent_id, true);
       xhttp.send();
 
     }
@@ -111,7 +111,7 @@ function add(name,pid)
     console.log(this.responseText)
     }
   };
-  xhttp.open("GET", "http://127.0.0.1:8000/Accessories/add/"+name+"/"+pid, true);
+  xhttp.open("GET", "/Accessories/add/"+name+"/"+pid, true);
   xhttp.send();
 
 }
