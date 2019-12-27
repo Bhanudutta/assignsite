@@ -15,4 +15,4 @@ run: python manage.py migrate
 run: python manage.py runserver
 
 and now connect to 127.0.0.1:8000/Accessories to access the site on LocalHost
-!(https://github.com/Bhanudutta/assignsite/blob/master/add.gif)
+![](https://github.com/Bhanudutta/assignsite/blob/master/add.gif)
