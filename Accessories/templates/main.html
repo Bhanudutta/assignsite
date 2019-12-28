@@ -33,7 +33,7 @@
       }
     btn.setAttribute("id",id+"_"+x)
     btn.setAttribute("class","btn btn-secondary")
-    btn.setAttribute("value","+")
+    btn.setAttribute("value",v)
     btn.style.width = "50px"
     return btn;
   }
@@ -47,6 +47,16 @@
         document.getElementById(ob[i].id).remove();
       }
     }
+  }
+  function rec_del(id)
+  {
+    childs = gl_tree[id]
+    for(i=0;i<childs.len;i++)
+    {
+      rec_del(gl_tree[childs[i].id])
+      delete childs[i]
+    }
+    delete gl_tree[id]
   }
   function traverse_tree(root,pid = -1,level = 0)
   {
@@ -65,7 +75,7 @@
         var v_btn = createPbutton(ob[i].id,ob[i].name)
         var a_btn = createSbutton(ob[i].id)
         margin = level*50;
-        v_btn.style.marginLeft = margin+"px";
+        d_btn.style.marginLeft = margin+"px";
 
         v_btn.onclick = function(){
           let id = this.id.slice(0,-2)
@@ -76,13 +86,15 @@
         a_btn.onclick = function(){
           let id = this.id.slice(0,-2)
           rec_collapse_children(id)
-          del(id);
+          let name = prompt("Enter name")
+          add(name,id);
         }
         d_btn.onclick = function(){
           let id = this.id.slice(0,-2)
           rec_collapse_children(id)
-          let name = prompt("Enter name")
-          add(name,id);
+          del(id);
+          document.getElementById(id).remove();
+          rec_del(id);
         }
         dv.appendChild(d_btn)
         dv.appendChild(v_btn)
@@ -120,23 +132,22 @@ function add(name,pid)
   xhttp.onreadystatechange = function() {
   if (this.readyState == 4 && this.status == 200) {
     console.log(this.responseText)
-    delete gl_tree[id];
     }
   };
   xhttp.open("GET", "/Accessories/add/"+name+"/"+pid, true);
   xhttp.send();
 
 }
-
 function del(id)
 {
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
   if (this.readyState == 4 && this.status == 200) {
     console.log(this.responseText)
+    //delete gl_tree[id];
     }
   };
-  xhttp.open("GET", "/Accessories/del/"+id, true);
+  xhttp.open("GET", "/Accessories/delete/"+id, true);
   xhttp.send();
 
 }
