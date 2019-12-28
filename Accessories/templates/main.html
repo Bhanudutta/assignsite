@@ -22,10 +22,13 @@
     btn.style.width = "150px"
     return btn;
   }
-  function createSbutton(id)
+  function createSbutton(id,v="+")
   {
     var btn = document.createElement("input");
-    btn.setAttribute("id",id+"_s")
+    let x = "s"
+    if(v == "-")
+      x = "d"
+    btn.setAttribute("id",id+"_"+x)
     btn.setAttribute("class","btn btn-secondary")
     btn.setAttribute("value","+")
     btn.style.width = "50px"
@@ -55,6 +58,7 @@
         dv.setAttribute("level",level)
         dv.setAttribute("parent",pid)
         root.appendChild(dv);
+        var d_btn = createSbutton(ob[i].id,"-")
         var v_btn = createPbutton(ob[i].id,ob[i].name)
         var a_btn = createSbutton(ob[i].id)
         margin = level*50;
@@ -68,12 +72,16 @@
           }
         a_btn.onclick = function(){
           let id = this.id.slice(0,-2)
-          // let ele = document.getElementById(id)
-          // let l = Number(ele.getAttribute("level"))+1
+          rec_collapse_children(id)
+          del(id);
+        }
+        d_btn.onclick = function(){
+          let id = this.id.slice(0,-2)
           rec_collapse_children(id)
           let name = prompt("Enter name")
           add(name,id);
         }
+        dv.appendChild(d_btn)
         dv.appendChild(v_btn)
         dv.appendChild(a_btn)
       }
@@ -109,9 +117,23 @@ function add(name,pid)
   xhttp.onreadystatechange = function() {
   if (this.readyState == 4 && this.status == 200) {
     console.log(this.responseText)
+    delete gl_tree[id];
     }
   };
   xhttp.open("GET", "/Accessories/add/"+name+"/"+pid, true);
+  xhttp.send();
+
+}
+
+function del(id)
+{
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+  if (this.readyState == 4 && this.status == 200) {
+    console.log(this.responseText)
+    }
+  };
+  xhttp.open("GET", "/Accessories/del/"+id, true);
   xhttp.send();
 
 }
